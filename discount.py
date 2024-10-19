@@ -4,68 +4,109 @@ import glob
 import requests
 import base64
 import json
-
+import sys
+import io
+from apis import return_lyrics, read_audio_file
 from playg import main
+# Set encoding for stdout
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+key = os.environ.get('SHAZ_API_KEY')
 
 def step2(full_title):
-    key = os.environ.get('SHAZ_API_KEY')
-    files = glob.glob('audio_stream/clips/*')
     genius_id = 0
-    url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
-    querystring = {"q":str(full_title),"per_page":"1","page":"1", "text_format":"String"}
+    url = "https://shazam.p.rapidapi.com/songs/v2/detect"
+    querystring = {"timezone":"America/Chicago","locale":"en-US"}
+    payload = read_audio_file(full_title)
+    # payload = read_audio_file(f"audio_stream/clips/clip_1.wav")
+    # payload = read_audio_file("audio_stream/ex.wav")
+    # payload = open('audio_stream/clinteastwood_portion_mono.txt', 'rb')
     headers = {
-        "x-rapidapi-key": str(key),
-        "x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+        "x-rapidapi-key": key,
+        "x-rapidapi-host": "shazam.p.rapidapi.com",
+        "Content-Type": "text/plain"
     }
-    response = requests.get(url, headers=headers, params=querystring)
+
+    response = requests.post(url, data=payload, headers=headers, params=querystring)
     print(response.json())
     print(response.text)
     ax = json.loads(response.text)
-    #look up song name for ID
-    if response.status_code == 200 and 0 in ax["hits"]:
-            print("IN____________________ ID FOUND")
-            genius_id = ax['hits'][0]['result']['id']
-            print(f'Genius ID: {genius_id}')
-            # break
 
-            url = "https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/"
-            # genius_id = 115478
-            querystring = {"id":str(genius_id), "text_format":"html"}
-            headers = {
-                "x-rapidapi-key": str(key),
-                "x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
-            }
-            response = requests.get(url, headers=headers, params=querystring)
-            print(response.text)
-            ax = json.loads(response.text)
-            #Return Song Lyrics
-            if response.status_code == 200 and "lyrics" in ax:
+    #Song ID'd
+    if response.status_code == 200 and "track" in ax:
+        print("IN____________________ SONG FOUND")
+        song_name = ax['track']['title']
+        song_artist = ax['track']['subtitle']
+        print(f'Title Name: {song_name}')
+        print(f'Artist: {song_artist}')
+        full_title = song_name + " " + song_artist
+        print(full_title)
+        if 'images' in ax['track']:
+            coverart = ax['track']['images']['coverart']
+        
+        #look up song name for ID
+        ax = return_lyrics(song_name, song_artist)
+        
+        if response.status_code == 200 and "hits" in ax:
+                print("IN____________________ ID FOUND")
+                genius_id = ax['hits'][0]['result']['id']
+                print(f'Genius ID: {genius_id}')
+                
+                if ax['hits'][0]['result']['instrumental']:
+                    print("This song is a confirmed instrumental")
+                    #return 2, song_name, song_artist, "", ""
+
+
+                url = "https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/"
+                # genius_id = 115478
+                querystring = {"id":str(genius_id), "text_format":"html"}
+                headers = {
+                    "x-rapidapi-key": str(key),
+                    "x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+                }
+                response = requests.get(url, headers=headers, params=querystring)
+                # print(response.text)
+                ax = json.loads(response.text)
+
+                #Return Song Lyrics
+                if response.status_code == 200 and "lyrics" in ax:
                     print("IN____________________ LYRICS FOUND")
                     print('Lyrics: \n\n')
                     lyric_check = ax['lyrics']['lyrics']['body']['html']	
                     if lyric_check:
                         if not isinstance(lyric_check, str):lyric_check = str(lyric_check)
-                        import sys
-                        import io
-                        # Set encoding for stdout
-                        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+                        
                         print('Lyrics_after wrapper: \n\n')
                         print(lyric_check)
+                        ret_val = lyric_check
                         from bs4 import BeautifulSoup
                         soup = BeautifulSoup(lyric_check, features="html.parser")
                         s_txt = soup.get_text()
                         print('\n\n s_txt Lyrics: \n\n')
                         print(s_txt)
-                        
-                    else:
-                        print("Cool song, however there are no lyrics for this cool tune")
-            elif response.status_code == 200:
-                print('Error: cant find track___________________lyrics' )
-
+                        from trans import detect, translate
+                        return 1, full_title
+                        # co, la = detect(s_txt[:130])
+                        # if co != "en":
+                        # 	print("Natural Langauage: " + la)
+                        # 	print("english Translation:\n")
+                        # 	print(translate(s_txt, "en"))
+                
+                        # return 3, song_name, song_artist, la, ret_val
+                elif response.status_code == 200:
+                    print('Error: cant find track___________________lyrics' )
+             
+        elif response.status_code == 200:
+            print('Error: cant find track___________________Id' )
+            print("Songs lyrics have not been located on the API/not recorded or song is likely an instrumental")
+            return 0, ""
+            # return 1, song_name, song_artist, "", ""
+           
+    
     elif response.status_code == 200:
-        print('Error: cant find track___________________Id' )
+        print('Error: cant find track___________________at all' )
+        time.sleep(1.1)
+        return 0, ""
+		# full_title = "Bye Bye Bye *NSYNC"
 
-titole = main()
-if titole != None:
-    step2(titole)
+
    

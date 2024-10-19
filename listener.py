@@ -1,7 +1,8 @@
 import wave
 from dataclasses import dataclass, asdict
 import pyaudio
-
+import os
+import glob
 ##this code is originally by musikalkemist and has been implemented into our program for educational purposes
 ##link to the original work https://github.com/musikalkemist/recorder
 @dataclass
@@ -67,9 +68,25 @@ class Recorder:
 
 from splitter import auto_split
 from apis import run_apis_1
+from discount import step2
 if __name__ == "__main__":
-    stream_params = StreamParams()
-    recorder = Recorder(stream_params)
-    recorder.record(8, "audio_stream/audio.wav")
-    auto_split()
-    run_apis_1()
+    cycles = 3
+    secs = 3
+
+    files = glob.glob('audio_stream/clips/*')
+    for f in files:
+        os.remove(f)
+
+
+    for x in range (cycles):
+        stream_params = StreamParams()
+        recorder = Recorder(stream_params)
+        recorder.record((secs + 1), f"audio_stream/clips/clip_{x}.wav")
+
+        code, name = step2(f"audio_stream/clips/clip_{x}.wav")
+        if code == 1:
+            print(name)
+            print("NEW WAY FOUND!!!")
+            break
+    # auto_split()
+    # run_apis_1()

@@ -88,5 +88,10 @@ if __name__ == "__main__":
             print(name)
             print("NEW WAY FOUND!!!")
             break
+        
+    #original method of calling listener.py
+    # stream_params = StreamParams()
+    #recorder = Recorder(stream_params)
+    #recorder.record(8, "audio_stream/audio.wav")
     # auto_split()
     # run_apis_1()

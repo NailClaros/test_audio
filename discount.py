@@ -98,7 +98,7 @@ def step2(full_title):
         elif response.status_code == 200:
             print('Error: cant find track___________________Id' )
             print("Songs lyrics have not been located on the API/not recorded or song is likely an instrumental")
-            return 0, ""
+            return 1, full_title
             # return 1, song_name, song_artist, "", ""
            
     

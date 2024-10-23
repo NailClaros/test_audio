@@ -9,14 +9,12 @@ import io
 
 coverart = ""
 full_title = ""
-# Set encoding for stdout
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-key = os.environ.get('SHAZ_API_KEY')
+key = os.getenv('SHAZ_API_KEY')
 
 def read_audio_file(file_path):
-		with open(file_path, 'rb') as audio_file:
-			return base64.b64encode(audio_file.read()).decode('utf-8')
+        with open(file_path, 'rb') as audio_file:
+            return base64.b64encode(audio_file.read()).decode('utf-8')
 		
 def run_apis_1():
 	files = glob.glob('audio_stream/clips/*')
@@ -86,13 +84,13 @@ def run_apis_1():
 							if not isinstance(lyric_check, str):lyric_check = str(lyric_check)
 							
 							print('Lyrics_after wrapper: \n\n')
-							print(lyric_check)
+							print(lyric_check, flush=True)
 							ret_val = lyric_check
 							from bs4 import BeautifulSoup
 							soup = BeautifulSoup(lyric_check, features="html.parser")
 							s_txt = soup.get_text()
 							print('\n\n s_txt Lyrics: \n\n')
-							print(s_txt)
+							print(s_txt, flush=True)
 							from trans import detect, translate
 							# co, la = detect(s_txt[:130])
 							# if co != "en":
@@ -113,7 +111,7 @@ def run_apis_1():
 		
 		elif response.status_code == 200:
 			print('Error: cant find track___________________at all' )
-			time.sleep(1.1)
+			time.sleep(1)
 		# full_title = "Bye Bye Bye *NSYNC"
 
 	# return 0, "", "", "", "" ##return code 0 to indicate no song could be identified at all
@@ -122,43 +120,106 @@ def run_apis_1():
 
 
 def return_lyrics(s_name, s_artist):
-	# Try s_name and one artist if possible only 
+	# Try s_name and one artist if possible only
+    print("RUN 1")
     if "," in s_artist: 
-        url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
-        querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
-        headers = {
-			"x-rapidapi-key": str(key),
-			"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
-		}
-        response = requests.get(url, headers=headers, params=querystring)
-        print(response.json())
-        # print(response.text)
-        ax = json.loads(response.text)
+        if "-" in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name.split("-")[0].strip() + " " + s_artist.split(",")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
 
-        if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split(",")[0].strip() or s_artist.split(",")[0].strip() in ax['hits'][0]['result']['artist_names']):
-            print("NO ,: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
-            return ax
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split(",")[0].strip() or s_artist.split(",")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO ,: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
+                return ax
+        if "(" in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split(",")[0].strip() or s_artist.split(",")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO ,: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
+                return ax
+        if "(" not in s_name and "-" not in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+			# print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split(",")[0].strip() or s_artist.split(",")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO , and clean s_name: " + s_name + " " + s_artist.split(",")[0].strip())
+                return ax
     if "&" in s_artist:
-        url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
-        querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist.split("&")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
-        headers = {
-			"x-rapidapi-key": str(key),
-			"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
-		}
-        response = requests.get(url, headers=headers, params=querystring)
-        print(response.json())
-        # print(response.text)
-        ax = json.loads(response.text)
+        if "-" in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name.split("-")[0].strip() + " " + s_artist.split("&")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
 
-        if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split("&")[0].strip() or s_artist.split("&")[0].strip() in ax['hits'][0]['result']['artist_names']):
-            print("NO &: " + s_name.split("(")[0].strip() + " " + s_artist.split("&")[0].strip())
-            return ax
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split("&")[0].strip() or s_artist.split("&")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO &: " + s_name.split("-")[0].strip() + " " + s_artist.split("&")[0].strip())
+                return ax
+        if "(" in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist.split("&")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split("&")[0].strip() or s_artist.split("&")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO &: " + s_name.split("(")[0].strip() + " " + s_artist.split("&")[0].strip())
+                return ax
+        if "(" not in s_name and "-" not in s_name:
+            url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
+            querystring = {"q": str(s_name + " " + s_artist.split("&")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "genius-song-lyrics1.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist.split("&")[0].strip() or s_artist.split("&")[0].strip() in ax['hits'][0]['result']['artist_names']):
+                print("NO & and clean s_name: " + s_name + " " + s_artist.split("&")[0].strip())
+                return ax
 
 
 
 
 
-
+    print("RUN 2")
     # Try artist and song name together
     url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
     querystring = {"q": str(s_name + " " + s_artist), "per_page": "1", "page": "1", "text_format": "String"}
@@ -170,14 +231,14 @@ def return_lyrics(s_name, s_artist):
     print(response.json())
     # print(response.text)
     ax = json.loads(response.text)
-    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist or s_artist in ax['hits'][0]['result']['artist_names']):
+    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'].casefold() in s_artist.casefold() or s_artist.casefold() in ax['hits'][0]['result']['artist_names'].casefold()):
         print("STANDARD PROCEDURE")
         return ax
 
 
 
 
-
+    print("RUN 3")
     # Try formatted s_name
     url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
     querystring = {"q": str(s_name.split("(")[0].strip() + " " + s_artist), "per_page": "1", "page": "1", "text_format": "String"}
@@ -190,11 +251,12 @@ def return_lyrics(s_name, s_artist):
     # print(response.text)
     ax = json.loads(response.text)
 
-    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist or s_artist in ax['hits'][0]['result']['artist_names']):
+    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'].casefold() in s_artist.casefold() or s_artist.casefold() in ax['hits'][0]['result']['artist_names'].casefold()):
         print("formatted S-Name: " + s_name.split("(")[0].strip() + " " + s_artist)
         return ax
 
 
+    print("RUN 4")
 	#LAST RESORT, STRIP SNAME ONLY
     url = "https://genius-song-lyrics1.p.rapidapi.com/search/"
     querystring = {"q": str(s_name.split("(")[0].strip()), "per_page": "1", "page": "1", "text_format": "String"}
@@ -207,7 +269,7 @@ def return_lyrics(s_name, s_artist):
     # print(response.text)
     ax = json.loads(response.text)
 
-    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'] in s_artist or s_artist in ax['hits'][0]['result']['artist_names']):
+    if response.status_code == 200 and ax["hits"] and (ax['hits'][0]['result']['artist_names'].casefold() in s_artist.casefold() or s_artist.casefold() in ax['hits'][0]['result']['artist_names'].casefold()):
         print("LAST RESORT: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
         return ax
 

@@ -1,7 +1,8 @@
 import wave
 from dataclasses import dataclass, asdict
 import pyaudio
-
+import os
+import glob
 ##this code is originally by musikalkemist and has been implemented into our program for educational purposes
 ##link to the original work https://github.com/musikalkemist/recorder
 @dataclass
@@ -32,18 +33,17 @@ class Recorder:
         self._wav_file = None
 
     def record(self, duration: int, save_path: str) -> None:
-        """Record sound from mic for a given amount of seconds.
-
-        :param duration: Number of seconds we want to record for
-        :param save_path: Where to store recording
-        """
-        print("Start recording...")
-        self._create_recording_resources(save_path)
-        self._write_wav_file_reading_from_stream(duration)
-        self._close_recording_resources()
-        print("Stop recording")
+        try:
+            self._create_recording_resources(save_path)
+            self._write_wav_file_reading_from_stream(duration)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self._close_recording_resources()
+        
 
     def _create_recording_resources(self, save_path: str) -> None:
+        
         self._pyaudio = pyaudio.PyAudio()
         self._stream = self._pyaudio.open(**self.stream_params.to_dict())
         self._create_wav_file(save_path)
@@ -60,16 +60,54 @@ class Recorder:
             self._wav_file.writeframes(audio_data)
 
     def _close_recording_resources(self) -> None:
-        self._wav_file.close()
-        self._stream.close()
-        self._pyaudio.terminate()
+        if self._wav_file is not None:
+            self._wav_file.close()
+            self._wav_file = None  # Set to None to prevent further access
+        if self._stream is not None:
+            self._stream.close()
+            self._stream = None  # Set to None to prevent further access
+        if self._pyaudio is not None:
+            self._pyaudio.terminate()
+            self._pyaudio = None  # Set to None to prevent further access
 
 
 from splitter import auto_split
 from apis import run_apis_1
+from discount import step2
 if __name__ == "__main__":
-    stream_params = StreamParams()
-    recorder = Recorder(stream_params)
-    recorder.record(8, "audio_stream/audio.wav")
-    auto_split()
-    run_apis_1()
+    cycles = 3
+    secs = 3
+    name = ""
+    code = 0
+    files = glob.glob('audio_stream/clips/*')
+    for f in files:
+        os.remove(f)
+
+
+    for x in range (cycles):
+        stream_params = StreamParams()
+        recorder = Recorder(stream_params)
+        recorder.record((secs + 1), f"audio_stream/clips/clip_{x}.wav")
+        exa = f"audio_stream/clips/clip_{x}.wav"
+        
+        code, name = step2(exa)
+        if code == 3: #perfect run
+            print(name)
+            print("NEW WAY FOUND!!!")
+            break
+        if code == 2: #confirmed instrumental
+            print(name)
+            print("Confirmed Intrumental")
+            break
+        if code == 1: #likely lyrics not recorded or is an instrumental
+            print(name)
+            print("Unlucky")
+            break
+
+    
+    #original method of calling listener.py
+    # stream_params = StreamParams()
+    #recorder = Recorder(stream_params)
+    #recorder.record(8, "audio_stream/audio.wav")
+    # auto_split()
+    # run_apis_1()

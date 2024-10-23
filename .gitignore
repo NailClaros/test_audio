@@ -4,3 +4,4 @@ __pycache__/
 audio_stream/*.wav
 audio_stream/*.txt
 audio_stream/clips/*.wav
+ex.py

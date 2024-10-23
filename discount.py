@@ -7,9 +7,9 @@ import json
 import sys
 import io
 from apis import return_lyrics, read_audio_file
-from playg import main
+
 # Set encoding for stdout
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 key = os.environ.get('SHAZ_API_KEY')
 
 def step2(full_title):
@@ -53,7 +53,8 @@ def step2(full_title):
                 
                 if ax['hits'][0]['result']['instrumental']:
                     print("This song is a confirmed instrumental")
-                    #return 2, song_name, song_artist, "", ""
+                    # return 2, song_name, song_artist, "", ""
+                    return 2, full_title
 
 
                 url = "https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/"
@@ -74,17 +75,17 @@ def step2(full_title):
                     lyric_check = ax['lyrics']['lyrics']['body']['html']	
                     if lyric_check:
                         if not isinstance(lyric_check, str):lyric_check = str(lyric_check)
-                        
+                        # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
                         print('Lyrics_after wrapper: \n\n')
-                        print(lyric_check)
+                        print(lyric_check, flush=True)
                         ret_val = lyric_check
                         from bs4 import BeautifulSoup
                         soup = BeautifulSoup(lyric_check, features="html.parser")
                         s_txt = soup.get_text()
                         print('\n\n s_txt Lyrics: \n\n')
-                        print(s_txt)
+                        print(s_txt, flush=True)
                         from trans import detect, translate
-                        return 1, full_title
+                        return 3, full_title
                         # co, la = detect(s_txt[:130])
                         # if co != "en":
                         # 	print("Natural Langauage: " + la)
@@ -104,9 +105,11 @@ def step2(full_title):
     
     elif response.status_code == 200:
         print('Error: cant find track___________________at all' )
-        time.sleep(1.1)
+        time.sleep(.6)
+        # return 1, "", "", "", ""
         return 0, ""
 		# full_title = "Bye Bye Bye *NSYNC"
 
 
-   
+
+

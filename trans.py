@@ -21,7 +21,7 @@ def detect(text):
 
     response = requests.post(url, json=payload, headers=headers, params=querystring)
 
-    print(response.json())
+    # print(response.json())
     ax = json.loads(response.text)
     code = ax['result']['code']
     language = ax['result']['language']
@@ -52,7 +52,7 @@ def translate(text, lang):
 
         response = requests.post(url, json=payload, headers=headers)
 
-        print(response.json())
+        # print(response.json())
         ax = json.loads(response.text)
         
         return ax['data']['translations']['translatedText']

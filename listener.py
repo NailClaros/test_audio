@@ -79,6 +79,8 @@ if __name__ == "__main__":
     secs = 3
     name = ""
     code = 0
+    import time
+    st = time.time()
     files = glob.glob('audio_stream/clips/*')
     for f in files:
         os.remove(f)
@@ -94,16 +96,25 @@ if __name__ == "__main__":
         if code == 3: #perfect run
             print(name)
             print("NEW WAY FOUND!!!")
+            et = time.time()
+            print(f"time = {et - st} seconds")
             break
         if code == 2: #confirmed instrumental
             print(name)
             print("Confirmed Intrumental")
+            et = time.time()
+            print(f"time = {et - st} seconds")
             break
         if code == 1: #likely lyrics not recorded or is an instrumental
             print(name)
             print("Unlucky")
+            et = time.time()
+            print(f"time = {et - st} seconds")
             break
-
+    if code == 0:
+        print("Could retrieve nothing....")
+        et = time.time()
+        print(f"time = {et - st} seconds")
     
     #original method of calling listener.py
     # stream_params = StreamParams()

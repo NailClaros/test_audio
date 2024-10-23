@@ -7,7 +7,7 @@ import json
 import sys
 import io
 from apis import return_lyrics, read_audio_file
-
+from bs4 import BeautifulSoup
 # Set encoding for stdout
 
 key = os.environ.get('SHAZ_API_KEY')
@@ -27,8 +27,8 @@ def step2(full_title):
     }
 
     response = requests.post(url, data=payload, headers=headers, params=querystring)
-    print(response.json())
-    print(response.text)
+    # print(response.json(), flush=True)
+    # print(response.text, flush=True)
     ax = json.loads(response.text)
 
     #Song ID'd
@@ -36,6 +36,7 @@ def step2(full_title):
         print("IN____________________ SONG FOUND")
         song_name = ax['track']['title']
         song_artist = ax['track']['subtitle']
+        
         print(f'Title Name: {song_name}')
         print(f'Artist: {song_artist}')
         full_title = song_name + " " + song_artist
@@ -75,23 +76,21 @@ def step2(full_title):
                     lyric_check = ax['lyrics']['lyrics']['body']['html']	
                     if lyric_check:
                         if not isinstance(lyric_check, str):lyric_check = str(lyric_check)
-                        # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
                         print('Lyrics_after wrapper: \n\n')
                         print(lyric_check, flush=True)
                         ret_val = lyric_check
-                        from bs4 import BeautifulSoup
+                        
                         soup = BeautifulSoup(lyric_check, features="html.parser")
                         s_txt = soup.get_text()
                         print('\n\n s_txt Lyrics: \n\n')
-                        print(s_txt, flush=True)
+                        # print(s_txt, flush=True)
                         from trans import detect, translate
+                        co, la = detect(s_txt[:130])
+                        if co != "en":
+                            print("Natural Langauage: " + la)
+                            print("english Translation:\n")
+                            print(translate(ret_val, "en"))
                         return 3, full_title
-                        # co, la = detect(s_txt[:130])
-                        # if co != "en":
-                        # 	print("Natural Langauage: " + la)
-                        # 	print("english Translation:\n")
-                        # 	print(translate(s_txt, "en"))
-                
                         # return 3, song_name, song_artist, la, ret_val
                 elif response.status_code == 200:
                     print('Error: cant find track___________________lyrics' )

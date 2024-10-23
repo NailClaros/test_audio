@@ -91,14 +91,16 @@ def run_apis_1():
 							s_txt = soup.get_text()
 							print('\n\n s_txt Lyrics: \n\n')
 							print(s_txt, flush=True)
-							from trans import detect, translate
+                            ##Translation section!-------------------------------
+							# from trans import detect, translate
 							# co, la = detect(s_txt[:130])
 							# if co != "en":
 							# 	print("Natural Langauage: " + la)
 							# 	print("english Translation:\n")
 							# 	print(translate(s_txt, "en"))
+                            #   return 3, song_name, song_artist, la, ret_val
 							break
-							# return 3, song_name, song_artist, la, ret_val
+							
 					elif response.status_code == 200:
 						print('Error: cant find track___________________lyrics' )
 						break

@@ -54,8 +54,8 @@ def step2(full_title):
                 
                 if ax['hits'][0]['result']['instrumental']:
                     print("This song is a confirmed instrumental")
-                    # return 2, song_name, song_artist, "", ""
-                    return 2, full_title
+                    return 2, song_name, song_artist, "", ""
+                    # return 2, full_title
 
 
                 url = "https://genius-song-lyrics1.p.rapidapi.com/song/lyrics/"
@@ -81,34 +81,33 @@ def step2(full_title):
                         ret_val = lyric_check
                         
                         soup = BeautifulSoup(lyric_check, features="html.parser")
-                        s_txt = soup.get_text()
+                        ret_val = soup.get_text()
                         print('\n\n s_txt Lyrics: \n\n')
-                        # print(s_txt, flush=True)
+                        print(ret_val, flush=True)
                         from trans import detect, translate
-                        co, la = detect(s_txt[:130])
-                        if co != "en":
-                            print("Natural Langauage: " + la)
-                            print("english Translation:\n")
-                            print(translate(ret_val, "en"))
-                        return 3, full_title
-                        # return 3, song_name, song_artist, la, ret_val
+                        co, la = detect(ret_val[:130])
+                        # if co != "en":
+                        #     print("Natural Langauage: " + la)
+                        #     print("english Translation:\n")
+                        #     print(translate(ret_val, "en"))
+                        # return 3, full_title
+                        return 3, song_name, song_artist, la, ret_val, coverart
                 elif response.status_code == 200:
                     print('Error: cant find track___________________lyrics' )
              
         elif response.status_code == 200:
             print('Error: cant find track___________________Id' )
             print("Songs lyrics have not been located on the API/not recorded or song is likely an instrumental")
-            return 1, full_title
-            # return 1, song_name, song_artist, "", ""
+            # return 1, ful_title
+            return 1, song_name, song_artist, "", "", coverart
            
     
     elif response.status_code == 200:
         print('Error: cant find track___________________at all' )
         time.sleep(.6)
-        # return 1, "", "", "", ""
-        return 0, ""
+        return 0, "", "", "", "", ""
+        # return 0, ""
 		# full_title = "Bye Bye Bye *NSYNC"
-
 
 
 

@@ -33,13 +33,10 @@ class Recorder:
         self._wav_file = None
 
     def record(self, duration: int, save_path: str) -> None:
-        try:
-            self._create_recording_resources(save_path)
-            self._write_wav_file_reading_from_stream(duration)
-        except Exception as e:
-            print(f"An error occurred: {e}")
-        finally:
-            self._close_recording_resources()
+
+        self._create_recording_resources(save_path)
+        self._write_wav_file_reading_from_stream(duration)
+        self._close_recording_resources()
         
 
     def _create_recording_resources(self, save_path: str) -> None:
@@ -122,3 +119,50 @@ if __name__ == "__main__":
     #recorder.record(8, "audio_stream/audio.wav")
     # auto_split()
     # run_apis_1()
+
+def run():
+    cycles = 3
+    secs = 3
+    name = ""
+    art = ""
+    lang = ""
+    lyric = ""
+    ca = ""
+    code = 0
+    import time
+    st = time.time()
+    files = glob.glob('audio_stream/clips/*')
+    for f in files:
+        os.remove(f)
+
+
+    for x in range (cycles):
+        stream_params = StreamParams()
+        recorder = Recorder(stream_params)
+        recorder.record((secs + 1), f"audio_stream/clips/clip_{x}.wav")
+        exa = f"audio_stream/clips/clip_{x}.wav"
+        
+        code, name, art, lang, lyric, ca = step2(exa)
+        if code == 3: #perfect run
+            print(name)
+            print("NEW WAY FOUND!!!")
+            et = time.time()
+            print(f"time = {et - st} seconds")
+            return code, name, art, lang, lyric, ca
+        if code == 2: #confirmed instrumental
+            print(name)
+            print("Confirmed Intrumental")
+            et = time.time()
+            print(f"time = {et - st} seconds")
+            return code, name, art, lang, lyric, ca
+        if code == 1: #likely lyrics not recorded or is an instrumental
+            print(name)
+            print("Unlucky")
+            et = time.time()
+            print(f"time = {et - st} seconds")
+            return code, name, art, lang, lyric, ca
+    if code == 0:
+        print("Could retrieve nothing....")
+        et = time.time()
+        print(f"time = {et - st} seconds")
+        return code, name, art, lang, lyric, ca

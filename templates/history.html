@@ -7,8 +7,15 @@
 </head>
 <body>
     <h1>Shazamio Audio Recognition- history!</h1>
-    <img src="{{ url_for('static', filename='images/l3.png') }}" style="height: 100px; width: 100px;">
-
+    {% block body %}
+        {% if res %}
+        {% for x in res|reverse %}
+            <p> {{x[0]}} by {{x[1]}} </p>
+        {% endfor %}
+        {% else %}
+            <p>Nothing here for now!</p>
+        {% endif %}
+    {% endblock %}
     <h1>
         <a href="{{ url_for('hello_world') }}">Link to home</a>
     </h1>

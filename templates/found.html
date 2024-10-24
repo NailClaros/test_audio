@@ -7,8 +7,13 @@
 </head>
 <body>
     <h1>Shazamio Audio Recognition- SONG FOUND!</h1>
-    <img src="{{ url_for('static', filename='images/l3.png') }}" style="height: 100px; width: 100px;">
-
+    {% block body %}
+        <img src="{{ ca }}" style="height: 80px; width: 80px;">
+        <p>{{ name }}</p>
+        <p>by {{ art }}</p>
+        <p>Language: {{ lang }}</p>
+        
+    {% endblock %}
     <h1>
         <a href="{{ url_for('hello_world') }}">Link to home</a>
     </h1>

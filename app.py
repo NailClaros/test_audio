@@ -17,6 +17,15 @@ spot_api = os.getenv('shaz_api')
 
 app = Flask(__name__)
 
+db = []
+def db_check(val):
+    if db.__contains__(val):
+        x = db.pop(db.index(val))
+        db.append(x)
+    else:
+        db.append(val)
+
+
 r = redis.Redis(host='redis', port=6379)
 
 @app.route('/')
@@ -25,15 +34,34 @@ def hello_world():
 
 @app.route('/history', methods=['get'])
 def history():
-    return render_template('history.html')
+    return render_template('history.html', res=db)
+
+@app.route('/detected', methods=['GET'])
+def detected():
+    name = request.args.get('name')
+    art = request.args.get('art')
+    lang = request.args.get('lang')
+    lyric = request.args.get('lyric')
+    ca = request.args.get('ca')
+
+    return render_template('found.html', name=name, art=art, lang=lang, lyric=lyric, ca=ca)
+
+@app.route('/translations', methods=['get'])
+def translations():
+    lyrics = request.args.get('lyrics')
+    return render_template('trans.html', ly=lyrics)
 
 @app.route('/run_listener', methods=['POST'])
 def run_listener():
-    try:
-        subprocess.run(['py', 'listener.py'], check=True)
-        return redirect(url_for('index'))  # Redirect back to the home page after the script is executed
-    except Exception as e:
-        return redirect(url_for('hello_world'))
-    
+    from listener import run
+    name = ""
+    code = 0
+    code, name, art, lang, lyric, ca = run()
+    if code == 0:
+        return redirect('/')
+    else:
+        db_check([name, art, lang, lyric, ca])
+        return redirect(url_for('detected', name=name, art=art, lang=lang, lyric=lyric, ca=ca))
+
 
 

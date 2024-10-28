@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 import subprocess
 import pathlib
 import os
 import redis
+import trans
 # from apis import testme
 
 spot_api = os.getenv('shaz_api')
@@ -46,6 +47,8 @@ def detected():
 
     return render_template('found.html', name=name, art=art, lang=lang, lyric=lyric, ca=ca)
 
+
+
 @app.route('/translations', methods=['get'])
 def translations():
     lyrics = request.args.get('lyrics')
@@ -61,7 +64,27 @@ def run_listener():
         return redirect('/')
     else:
         db_check([name, art, lang, lyric, ca])
-        return redirect(url_for('detected', name=name, art=art, lang=lang, lyric=lyric, ca=ca))
+        return redirect(url_for('testt', name=name, art=art, lang=lang, lyric=lyric, ca=ca))
 
 
+@app.route('/test')
+def testt():
+    name = request.args.get('name')
+    art = request.args.get('art')
+    lang = request.args.get('lang')
+    lyric = request.args.get('lyric')
+    ca = request.args.get('ca')
+    return render_template('testt.html', name = name, art=art, ca=ca, lyric = lyric, code = trans.get_langcode_from_lang(lang), lang=lang, lang_dict= trans.languages_dict)
 
+
+test = "In the heart of a bustling city, vibrant colors danced under the warm sun, while the scent of fresh pastries wafted through the air. Laughter echoed, blending with music, as friends shared stories and dreams unfolded in the midst of lively chatter."
+
+@app.route('/translate', methods=['POST'])
+def translate():
+    data = request.get_json()  # Use request.get_json() to parse JSON data
+    text = data.get('text')
+    lang = data.get('lang')
+
+    translated_text = trans.translate(text=text, lang=lang)  # Replace with your translation logic
+
+    return jsonify({'translatedText': translated_text})

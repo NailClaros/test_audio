@@ -62,6 +62,11 @@ def translate(text, lang):
 ###Coverart
 ###natural lang
 ###html translation
+def get_langcode_from_lang( value):
+    for key, val in languages_dict.items():
+        if val == value:
+            return key
+    return None
 languages_dict = {
     "en": "English",
     "af": "Afrikaans",

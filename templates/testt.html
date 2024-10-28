@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyric Lens</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>LyricLens test translate</h1>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        .textbox {
+            width: 50%; /* Adjust width as needed */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            $('#myDropdown').change(function() {
+                updateTranslation($(this).val());
+            });
+        });
+
+        function updateTranslation(selectedLang) {
+            const textToTranslate = `{{ lyric }}`; 
+
+            if (selectedLang) {
+                $.ajax({
+                    url: '/translate',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: textToTranslate, lang: selectedLang }),
+                    success: function(response) {
+                        $('#translation').val(response.translatedText); 
+                    },
+                    error: function() {
+                        alert('Error translating text');
+                    }
+                });
+            } else {
+                $('#translation').val(''); 
+            }
+        }
+
+    </script>
+{% block body %}
+    <img src="{{ ca }}" style="height: 80px; width: 80px;">
+    <p>{{ name }} by {{ art }}</p>
+    <p>Language: {{ lang }}</p>
+
+
+    <p> Choose an option:</p>
+    <select id="myDropdown">
+        <option value="">Select a language</option>
+            {% for key, value in lang_dict.items() %}
+                {% if value|upper != lang|upper %}            
+                    <option value="{{ key }}">{{ value }}</option>
+                {% endif %}
+            {% endfor %}
+        
+    </select>
+{% endblock %}
+<div class="container">
+    
+    <textarea type="text" class="textbox" placeholder="{{ lyric }}" readonly></textarea>
+    <textarea id="translation" class="textbox" placeholder="Pick a language! translations will appear here!" readonly></textarea>
+</div>
+
+
+    <h1>
+        <a href="{{ url_for('hello_world') }}">Link to home</a>
+    </h1>
+</body>
+</html>
+

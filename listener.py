@@ -3,6 +3,7 @@ from dataclasses import dataclass, asdict
 import pyaudio
 import os
 import glob
+import uuid
 ##this code is originally by musikalkemist and has been implemented into our program for educational purposes
 ##link to the original work https://github.com/musikalkemist/recorder
 @dataclass
@@ -71,11 +72,13 @@ class Recorder:
 from splitter import auto_split
 from apis import run_apis_1
 from discount import step2
+import uuid
 if __name__ == "__main__":
     cycles = 3
     secs = 3
     name = ""
     code = 0
+    uu = uuid.uuid4()
     import time
     st = time.time()
     files = glob.glob('audio_stream/clips/*')

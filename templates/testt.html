@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyric Lens</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>Shazamio test translate</h1>
+    <h1>LyricLens test translate</h1>
     <style>
         .container {
             display: flex;
@@ -14,31 +15,61 @@
             margin: 20px;
         }
         .textbox {
-            width: 45%; /* Adjust width as needed */
+            width: 50%; /* Adjust width as needed */
             padding: 10px;
             box-sizing: border-box;
         }
     </style>
     <script>
-        function updateTextarea() {
-            const dropdown = document.getElementById('myDropdown');
-            const textarea = document.getElementById('myTextarea');
-            textarea.value = dropdown.value;
+        $(document).ready(function() {
+            $('#myDropdown').change(function() {
+                updateTranslation($(this).val());
+            });
+        });
+
+        function updateTranslation(selectedLang) {
+            const textToTranslate = `{{ lyric }}`; 
+
+            if (selectedLang) {
+                $.ajax({
+                    url: '/translate',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: textToTranslate, lang: selectedLang }),
+                    success: function(response) {
+                        $('#translation').val(response.translatedText); 
+                    },
+                    error: function() {
+                        alert('Error translating text');
+                    }
+                });
+            } else {
+                $('#translation').val(''); 
+            }
         }
+
     </script>
+{% block body %}
+    <img src="{{ ca }}" style="height: 80px; width: 80px;">
+    <p>{{ name }} by {{ art }}</p>
+    <p>Language: {{ lang }}</p>
 
 
-<label for="myDropdown">Choose an option:</label>
-        <select id="myDropdown" onchange="updateTextarea(this)">
-            <option >Select a language</option>
-            <option value="{{ translate_(lyric, 'en') }}">English</option>
-            <option value="{{ translate_(lyric, 'zh-TW') }}">Chinese (Traditional)</option>
-            <option value="{{ translate_(lyric, 'fr') }}">French</option>
-        </select>
+    <p> Choose an option:</p>
+    <select id="myDropdown">
+        <option value="">Select a language</option>
+            {% for key, value in lang_dict.items() %}
+                {% if value|upper != lang|upper %}            
+                    <option value="{{ key }}">{{ value }}</option>
+                {% endif %}
+            {% endfor %}
+        
+    </select>
+{% endblock %}
 <div class="container">
     
     <textarea type="text" class="textbox" placeholder="{{ lyric }}" readonly></textarea>
-    <textarea type="text" id="myTextarea" value="" class="textbox" placeholder="Text Box 2" readonly></textarea>
+    <textarea id="translation" class="textbox" placeholder="Pick a language! translations will appear here!" readonly></textarea>
 </div>
 
 

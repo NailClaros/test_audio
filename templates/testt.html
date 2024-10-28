@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyric Lens</title>
+</head>
+<body>
+    <h1>Shazamio test translate</h1>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        .textbox {
+            width: 45%; /* Adjust width as needed */
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        function updateTextarea() {
+            const dropdown = document.getElementById('myDropdown');
+            const textarea = document.getElementById('myTextarea');
+            textarea.value = dropdown.value;
+        }
+    </script>
+
+
+<label for="myDropdown">Choose an option:</label>
+        <select id="myDropdown" onchange="updateTextarea(this)">
+            <option >Select a language</option>
+            <option value="{{ translate_(lyric, 'en') }}">English</option>
+            <option value="{{ translate_(lyric, 'zh-TW') }}">Chinese (Traditional)</option>
+            <option value="{{ translate_(lyric, 'fr') }}">French</option>
+        </select>
+<div class="container">
+    
+    <textarea type="text" class="textbox" placeholder="{{ lyric }}" readonly></textarea>
+    <textarea type="text" id="myTextarea" value="" class="textbox" placeholder="Text Box 2" readonly></textarea>
+</div>
+
+
+    <h1>
+        <a href="{{ url_for('hello_world') }}">Link to home</a>
+    </h1>
+</body>
+</html>
+

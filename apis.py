@@ -92,8 +92,8 @@ def run_apis_1():
 							print('\n\n s_txt Lyrics: \n\n')
 							print(s_txt, flush=True)
                             ##Translation section!-------------------------------
-							# from trans import detect, translate
-							# co, la = detect(s_txt[:130])
+							from trans import detect, translate
+							co, la = detect(s_txt[:130])
 							# if co != "en":
 							# 	print("Natural Langauage: " + la)
 							# 	print("english Translation:\n")

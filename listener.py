@@ -146,6 +146,12 @@ def run():
         exa = f"audio_stream/clips/clip_{x}.wav"
         
         code, name, art, lang, lyric, ca = step2(exa)
+        if code == 4: #perfect... however its a made up/giberish langauge
+            print(name)
+            print("Gibberish run")
+            et = time.time()
+            print(f"time = {et - st} seconds")
+            return code, name, art, lang, lyric, ca
         if code == 3: #perfect run
             print(name)
             print("NEW WAY FOUND!!!")

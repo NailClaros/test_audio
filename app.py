@@ -47,6 +47,14 @@ def detected():
 
     return render_template('found.html', name=name, art=art, lang=lang, lyric=lyric, ca=ca)
 
+@app.route('/lyrics', methods=['GET'])
+def lyrics():
+    name = request.args.get('name')
+    art = request.args.get('art')
+    lang = request.args.get('lang')
+    lyric = request.args.get('lyric')
+    ca = request.args.get('ca')
+    return render_template('lyrics.html', name=name, art=art, lang=lang, lyric=lyric, ca=ca)
 
 
 @app.route('/translations', methods=['get'])
@@ -62,10 +70,14 @@ def run_listener():
     code, name, art, lang, lyric, ca = run()
     if code == 0:
         return redirect('/')
-    else:
+    if code == 3:
         db_check([name, art, lang, lyric, ca])
         return redirect(url_for('testt', name=name, art=art, lang=lang, lyric=lyric, ca=ca))
+    if code == 4:
+        db_check([name, art, lang, lyric, ca])
+        return redirect(url_for('lyrics', name=name, art=art, lang=lang, lyric=lyric, ca=ca))
 
+    return redirect('/')
 
 @app.route('/test')
 def testt():

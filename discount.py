@@ -86,6 +86,9 @@ def step2(full_title):
                         print(ret_val, flush=True)
                         from trans import detect, translate
                         co, la = detect(ret_val[:130])
+                        if co == "MUL":
+                            print(co)
+                            return 4, song_name, song_artist, la, ret_val, coverart
                         # if co != "en":
                         #     print("Natural Langauage: " + la)
                         #     print("english Translation:\n")

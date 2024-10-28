@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LyricLens</title>
+</head>
+<body>
+    <h1>Shazamio Audio Recognition- SONG FOUND!</h1>
+    {% block body %}
+        <img src="{{ ca }}" style="height: 80px; width: 80px;">
+        <p>{{ name }}</p>
+        <p>by {{ art }}</p>
+        <p>Language: {{ lang }}</p>
+        <br>
+        <textarea type="text" class="textbox" placeholder="{{ lyric }}" readonly></textarea>
+    {% endblock %}
+    <h1>
+        <a href="{{ url_for('hello_world') }}">Link to home</a>
+    </h1>
+
+
+
+    
+</body>

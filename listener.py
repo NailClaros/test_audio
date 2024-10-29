@@ -70,8 +70,8 @@ class Recorder:
 
 
 from splitter import auto_split
-from apis import run_apis_1
-from discount import step2
+from apis import run_apis
+
 import uuid
 if __name__ == "__main__":
     cycles = 3
@@ -92,7 +92,7 @@ if __name__ == "__main__":
         recorder.record((secs + 1), f"audio_stream/clips/clip_{x}.wav")
         exa = f"audio_stream/clips/clip_{x}.wav"
         
-        code, name = step2(exa)
+        code, name,  song_artist, la, ret_val, coverart = run_apis(exa)
         if code == 3: #perfect run
             print(name)
             print("NEW WAY FOUND!!!")
@@ -145,8 +145,8 @@ def run():
         recorder.record((secs + 1), f"audio_stream/clips/clip_{x}.wav")
         exa = f"audio_stream/clips/clip_{x}.wav"
         
-        code, name, art, lang, lyric, ca = step2(exa)
-        if code == 4: #perfect... however its a made up/giberish langauge
+        code, name, art, lang, lyric, ca = run_apis(exa)
+        if lang == "Made up Language/gibberish": #perfect... however its a made up/giberish langauge
             print(name)
             print("Gibberish run")
             et = time.time()

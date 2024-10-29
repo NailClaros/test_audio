@@ -44,7 +44,6 @@ def translate(text, lang):
 
         payload = {
             "q": str(text),
-            "source": "auto",
             "target": str(lang)
         }
         headers = {
@@ -57,7 +56,6 @@ def translate(text, lang):
 
         # print(response.json())
         ax = json.loads(response.text)
-        
         return ax['data']['translations']['translatedText']
     return val
 

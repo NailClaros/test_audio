@@ -54,6 +54,7 @@ def lyrics():
     lang = request.args.get('lang')
     lyric = request.args.get('lyric')
     ca = request.args.get('ca')
+    
     return render_template('lyrics.html', name=name, art=art, lang=lang, lyric=lyric, ca=ca)
 
 

@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LyricLens</title>
 </head>
-<body>
-    <h1>Shazamio Audio Recognition- history!</h1>
+<body style="background-color: black; background-image: url('static/images/Lyric Lens (Background Image).png'); background-repeat: no-repeat; background-size: 100%; color: yellow;">
+    <img src="{{ url_for('static', filename='images/Lyric Lens (Text Logo and Icon) - Horizontal.png') }}" style="height: 110px; width: 400px; margin: auto;">
+
     {% block body %}
         {% if res %}
         {% for x in res|reverse %}
-            <p> {{x[0]}} by {{x[1]}} </p>
+            <p style="color: white;"> {{x[0]}} by {{x[1]}} </p>
         {% endfor %}
         {% else %}
-            <p>Nothing here for now!</p>
+            <p style="color: white;">Nothing here for now!</p>
         {% endif %}
     {% endblock %}
     <h1>

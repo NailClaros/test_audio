@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyric Lens</title>
-</head>
-<body style="text-align: center; background:rgb(0, 0, 0); background-image: url('static/images/Lyric Lens (Background Image).png'); background-repeat: no-repeat; background-size: cover; color: yellow;">
+{% extends '_template.html' %}
+{% block body %}
+<body style="text-align: center;">
     <img src="{{ url_for('static', filename='images/Lyric Lens (Text logo).png') }}" style="height: 40px; width: 500px; margin: auto;">
     <form action="/run_listener" method="post">
         <button type="submit" style=" background-color: transparent; border:none;">
@@ -21,3 +16,4 @@
 </body>
 </html>
 
+{% endblock %}

@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyric Lens</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body style="background-color: black; background-image: url('static/images/Lyric Lens (Background Image).png'); background-repeat: no-repeat; background-size: 100%; color: yellow;">
+{% extends '_template.html' %}
+{% block body %}
+<body>
     <h1>LyricLens test translate</h1>
     <style>
         .container {
@@ -49,7 +43,7 @@
         }
 
     </script>
-{% block body %}
+
     <img src="{{ ca }}" style="height: 80px; width: 80px;">
     <p>{{ name }} by {{ art }}</p>
     <p>Language: {{ lang }}</p>
@@ -65,7 +59,7 @@
             {% endfor %}
         
     </select>
-{% endblock %}
+
 <div class="container">
     
     <textarea type="text" class="textbox" placeholder="{{ lyric }}" readonly></textarea>
@@ -77,5 +71,5 @@
         <a href="{{ url_for('hello_world') }}" style="text-decoration: none;">Link to home</a>
     </h1>
 </body>
-</html>
+{% endblock %}
 

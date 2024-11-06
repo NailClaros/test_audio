@@ -1,10 +1,12 @@
 {% extends '_template.html' %}
 {% block body %}
 <body style="text-align: center;">
-    <img src="{{ url_for('static', filename='images/Lyric Lens (Text logo).png') }}" style="height: 40px; width: 500px; margin: auto;">
+    <img src="{{ url_for('static', filename='images/Lyric Lens (Text logo).png') }}" 
+    style="height: 40px; width: 500px; padding-top: 10%; filter: brightness(150%);">
     <form action="/run_listener" method="post">
-        <button type="submit" style=" background-color: transparent; border:none;">
-            <img src="{{ url_for('static', filename='images/Lyric Lens (Icon).png') }}" style="height: 300px; width: 300px; opacity: 90%;">
+        <button class="circle-button" type="submit" style=" background-color: transparent; border:none; border-radius: 50%;">
+            <img src="{{ url_for('static', filename='images/Lyric Lens (Icon).png') }}" 
+            style="height: 300px; width: 300px; border-radius: 50%; opacity: 80%; filter: brightness(120%) drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3));;">
         </button>
     </form>
 

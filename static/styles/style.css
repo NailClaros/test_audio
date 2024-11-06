@@ -4,4 +4,57 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     color: yellow;
+    font-family: 'Albert Sans';font-size: 22px;
+}
+
+.circle-button {
+    cursor: pointer;
+    transition: filter 0.5s ease; /* Smooth transition for shadow */
+}
+
+.circle-button:hover {
+    filter: drop-shadow(10px 0px 30px rgb(187, 12, 12)); /* Stronger shadow on hover */
+}
+
+.header-grid {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Image on the left, nav on the right */
+    align-items: center;
+    padding: 0;
+}
+
+/* Logo styles */
+.logo {
+    grid-column: 1;
+}
+
+.logo-img {
+    width: 60px; /* Adjust as needed */
+}
+
+/* Navigation bar styles */
+.nav-bar {
+    grid-column: 2;
+    text-align: right;
+}
+
+.nav-bar ul {
+    list-style-type: none;
+}
+
+.nav-bar ul li {
+    display: inline;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.nav-bar ul li a {
+    text-decoration: none;
+    color: yellow;
+    font-weight: bold;
+    padding-bottom: 10%;
+}
+
+.nav-bar ul li a:hover {
+    color: #857920;
 }

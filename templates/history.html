@@ -1,7 +1,19 @@
 {% extends '_template.html' %}
 {% block body %}
 <body>
-    <img src="{{ url_for('static', filename='images/Lyric Lens (Text Logo and Icon) - Horizontal.png') }}" style="height: 110px; width: 400px; margin: auto;">
+    <header class="header-grid">
+        <div class="logo">
+            <a href="{{ url_for('hello_world') }}"><img src="{{ url_for('static', filename='images/Lyric Lens (Text Logo and Icon) - Horizontal.png') }}" 
+            style="height: 110px; width: 400px; margin: auto; filter: brightness(150%);"></a>
+        </div>
+        <nav class="nav-bar">
+            <ul>
+                <li><a href="{{ url_for('hello_world') }}">HOME</a></li>
+                <li><a href="{{ url_for('history') }}">HISTORY</a></li>
+            </ul>
+        </nav>
+    </header>
+    
 
     
         {% if res %}

@@ -1,20 +1,27 @@
 import time
 import os
-import glob
 import requests
 import base64
 import json
-import sys
-import io
 from bs4 import BeautifulSoup
 coverart = ""
 full_title = ""
 
 key = os.getenv('SHAZ_API_KEY')
+# akey = os.getenv('alt_key')
 
 def read_audio_file(file_path):
         with open(file_path, 'rb') as audio_file:
             return base64.b64encode(audio_file.read()).decode('utf-8')
+        
+def extract_text_with_newlines(data):
+    multi_line_text = ""
+
+    for item in data:
+        text = item.get("text", "")
+        multi_line_text += text + "\n"
+
+    return multi_line_text
 		
 def run_apis(full_title):
     genius_id = 0
@@ -31,8 +38,7 @@ def run_apis(full_title):
     }
 
     response = requests.post(url, data=payload, headers=headers, params=querystring)
-    # print(response.json(), flush=True)
-    # print(response.text, flush=True)
+    print(response.text, flush=True)
     ax = json.loads(response.text)
 
     #Song ID'd
@@ -47,7 +53,22 @@ def run_apis(full_title):
         print(full_title)
         if 'images' in ax['track']:
             coverart = ax['track']['images']['coverart']
+        else:
+            coverart = "fail"
         
+
+        ##second chance call is here -- prio this for testing
+        ax = return_lyrics_MM(song_name, song_artist)
+        if ax != 'fail':
+            print("IN____________________ LYRICS FOUND")
+            ret_val = str(ax)
+            from trans import detect
+            co, la = detect(ret_val[:130])
+            if co == "MUL":
+                print(co)
+                return 4, song_name, song_artist, la, ret_val, coverart
+            return 3, song_name, song_artist, la, ret_val, coverart
+
         #look up song name for ID
         ax = return_lyrics(song_name, song_artist)
         
@@ -88,15 +109,16 @@ def run_apis(full_title):
                         ret_val = soup.get_text()
                         print('\n\n s_txt Lyrics: \n\n')
                         print(ret_val, flush=True)
-                        from trans import detect, translate
+                        from trans import detect
                         co, la = detect(ret_val[:130])
                         if co == "MUL":
                             print(co)
                             return 4, song_name, song_artist, la, ret_val, coverart
                         return 3, song_name, song_artist, la, ret_val, coverart
                 elif response.status_code == 200:
+                    ##Never seen 
                     print('Error: cant find track___________________lyrics' )
-             
+
         elif response.status_code == 200:
             print('Error: cant find track___________________Id' )
             print("Songs lyrics have not been located on the API/not recorded or song is likely an instrumental")
@@ -292,4 +314,143 @@ def return_lyrics(s_name, s_artist):
         print("LAST RESORT: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
         return ax
 
+    print("Genius Lyrics Failed----------------------- swaping to MM")
     return []
+
+def return_lyrics_MM(s_name, s_artist):
+	# Try s_name and one artist if possible only
+    print("RUN 1")
+    if "," in s_artist: 
+        if "-" in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name.split("-")[0].strip()),"a":str(s_artist.split(",")[0].strip()),"type":"json"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:
+                print("NO ,: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
+                return extract_text_with_newlines(ax)
+        if "(" in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name.split("(")[0].strip()),"a":str(s_artist.split(",")[0].strip()),"type":"json"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:
+
+                print("NO ,: " + s_name.split("(")[0].strip() + " " + s_artist.split(",")[0].strip())
+                return extract_text_with_newlines(ax)
+        if "(" not in s_name and "-" not in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name),"a":str(s_artist.split(",")[0].strip()),"type":"json"}
+
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+			# print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:
+                print("NO , and clean s_name: " + s_name + " " + s_artist.split(",")[0].strip())
+                return extract_text_with_newlines(ax)
+    if "&" in s_artist:
+        if "-" in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name.split("-")[0].strip()),"a":str(s_artist.split("&")[0].strip()),"type":"json"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:
+                print("NO &: " + s_name.split("-")[0].strip() + " " + s_artist.split("&")[0].strip())
+                return extract_text_with_newlines(ax)
+        if "(" in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name.split("(")[0].strip()),"a":str(s_artist.split("&")[0].strip()),"type":"json"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:  
+                print("NO &: " + s_name.split("(")[0].strip() + " " + s_artist.split("&")[0].strip())
+                return extract_text_with_newlines(ax)
+        if "(" not in s_name and "-" not in s_name:
+            url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+            querystring = {"t": str(s_name),"a":str(s_artist.split("&")[0].strip()),"type":"json"}
+            headers = {
+				"x-rapidapi-key": str(key),
+				"x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+			}
+            response = requests.get(url, headers=headers, params=querystring)
+            print(response.json())
+            # print(response.text)
+            ax = json.loads(response.text)
+
+            if response.status_code == 200 and 'error' not in ax:
+                print("NO & and clean s_name: " + s_name + " " + s_artist.split("&")[0].strip())
+                return extract_text_with_newlines(ax)
+
+
+    print("RUN 2")
+    # Try artist and song name together
+    url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+    querystring = {"t": str(s_name),"a":str( s_artist),"type":"json"}
+
+    headers = {
+        "x-rapidapi-key": str(key),
+        "x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    # print(response.json(), flush=True)
+    # print(response.text)
+    ax = json.loads(response.text)
+    if response.status_code == 200 and 'error' not in ax:
+        print("STANDARD PROCEDURE")
+        return extract_text_with_newlines(ax)
+
+
+
+    print("RUN 3")
+    # Try formatted s_name
+    url = "https://musixmatch-lyrics-songs.p.rapidapi.com/songs/lyrics"
+    querystring = {"t": str(s_name.split("(")[0].strip()),"a":str( s_artist),"type":"json"}
+    headers = {
+        "x-rapidapi-key": str(key),
+        "x-rapidapi-host": "musixmatch-lyrics-songs.p.rapidapi.com"
+    }
+    response = requests.get(url, headers=headers, params=querystring)
+    # print(response.json())
+    # print(response.text)
+    ax = json.loads(response.text)
+
+    if response.status_code == 200 and 'error' not in ax:
+        print("formatted S-Name: " + s_name.split("(")[0].strip() + " " + s_artist)
+        return extract_text_with_newlines(ax)
+
+    print("MM also failed-------------------------- Got nothing")
+    return 'fail'

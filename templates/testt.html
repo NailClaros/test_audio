@@ -43,8 +43,11 @@
         }
 
     </script>
-
-    <img src="{{ ca }}" style="height: 80px; width: 80px;">
+    {% if ca != "fail" %}
+        <img src="{{ ca }}" style="height: 80px; width: 80px;">
+    {% else %}
+        <img src="{{ url_for('static', filename='images/fail.jpg') }}" style="height: 80px; width: 80px;">
+    {% endif %}
     <p>{{ name }} by {{ art }}</p>
     <p>Language: {{ lang }}</p>
 
